@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StoryMap Planner</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" role="img"><path d="M3 5.5a2 2 0 0 1 2-2h5v17H5a2 2 0 0 0-2 2v-17Zm8-2h8a2 2 0 0 1 2 2v17a2 2 0 0 0-2-2h-8v-17Zm2 4h5v2h-5v-2Zm0 4h5v2h-5v-2Zm0 4h3v2h-3v-2Z"/></svg>
+      </span>
+      <div>
+        <h1>StoryMap Planner</h1>
+        <p class="subtitle">Plan first. Build in Esri StoryMaps later.</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button id="newProjectBtn" class="btn">New</button>
+      <span id="saveIndicator" class="save-indicator" aria-live="polite">Saved</span>
+      <button id="exportBtn" class="btn">Export</button>
+      <button id="importBtn" class="btn">Import</button>
+      <button id="themeToggleBtn" class="btn" aria-pressed="false">Theme</button>
+      <button id="helpBtn" class="btn">Help</button>
+      <button id="aiToggleBtn" class="btn btn-primary">AI Assist</button>
+      <input id="importInput" type="file" accept="application/json" hidden />
+    </div>
+  </header>
+
+  <main class="layout" id="appLayout">
+    <aside class="panel left-panel">
+      <section>
+        <h2>Story Metadata</h2>
+        <div class="form-grid" id="metaForm"></div>
+      </section>
+      <section>
+        <h2>Planning Helpers</h2>
+        <div id="arcSummary" class="helper-card"></div>
+        <div id="balanceSummary" class="helper-card"></div>
+        <div id="warnings" class="helper-card"></div>
+        <div id="overallCompleteness" class="helper-card"></div>
+      </section>
+      <section>
+        <h2>Templates</h2>
+        <div id="templateButtons" class="template-list"></div>
+      </section>
+    </aside>
+
+    <section class="panel main-panel">
+      <div class="panel-header">
+        <h2>Storyboard Canvas</h2>
+        <button id="addSectionBtn" class="btn btn-primary">+ Add section</button>
+      </div>
+      <div id="emptyState" class="empty-state" hidden>
+        <p>No sections yet. Start by adding a section or loading a template.</p>
+      </div>
+      <ol id="sectionList" class="section-list" aria-label="Storyboard sections"></ol>
+    </section>
+
+    <aside class="panel right-panel">
+      <h2>Section Editor</h2>
+      <div id="sectionEditorEmpty">Select a section card to edit details.</div>
+      <form id="sectionEditor" hidden></form>
+    </aside>
+  </main>
+
+  <dialog id="addSectionModal">
+    <form method="dialog" class="modal-content">
+      <h2>Add section</h2>
+      <p>Select a section type:</p>
+      <div id="sectionTypeOptions" class="type-grid"></div>
+      <div class="modal-actions">
+        <button class="btn" value="cancel">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="helpModal">
+    <form method="dialog" class="modal-content">
+      <h2>How to use StoryMap Planner</h2>
+      <ol>
+        <li>Add sections using <strong>+ Add section</strong> or load a template.</li>
+        <li>Select a section card and fill the right panel details.</li>
+        <li>Drag cards to reorder, or use move up/down buttons and keyboard.</li>
+        <li>Use Export for JSON, Markdown, plain text, or printable storyboard.</li>
+      </ol>
+      <h3>Keyboard controls</h3>
+      <ul>
+        <li><strong>Tab / Shift+Tab</strong>: move between controls</li>
+        <li><strong>Enter</strong>: open buttons and actions</li>
+        <li><strong>Alt + Arrow Up/Down</strong> on selected card: move section</li>
+        <li><strong>Delete</strong> on selected card: delete section</li>
+      </ul>
+      <div class="modal-actions">
+        <button class="btn btn-primary" value="default">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="exportModal">
+    <form method="dialog" class="modal-content">
+      <h2>Export</h2>
+      <div class="export-grid">
+        <button id="exportJsonBtn" type="button" class="btn">Export JSON</button>
+        <button id="exportMarkdownBtn" type="button" class="btn">Export Markdown</button>
+        <button id="exportTextBtn" type="button" class="btn">Export Plain Text</button>
+        <button id="printBtn" type="button" class="btn">Print Storyboard</button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" value="cancel">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <aside id="aiPanel" class="ai-panel" aria-live="polite" hidden>
+    <div class="ai-panel-header">
+      <h2>AI Assist</h2>
+      <button id="closeAiPanelBtn" class="btn" aria-label="Close AI panel">✕</button>
+    </div>
+    <p id="aiStatus" class="ai-status"></p>
+    <label for="aiTemplateStyle">Template style for outline</label>
+    <input id="aiTemplateStyle" type="text" placeholder="e.g., journalistic, educational" />
+    <div class="ai-actions">
+      <button data-ai-op="outline" class="btn">Generate outline</button>
+      <button data-ai-op="improve_key_message" class="btn">Improve key message</button>
+      <button data-ai-op="draft_section_text" class="btn">Draft section text</button>
+      <button data-ai-op="suggest_alt_text" class="btn">Suggest alt text</button>
+      <button data-ai-op="suggest_cta" class="btn">Suggest CTA</button>
+      <button data-ai-op="quality_check" class="btn">Quality check</button>
+    </div>
+    <label for="aiOutput">AI Output</label>
+    <textarea id="aiOutput" rows="12" readonly></textarea>
+  </aside>
+
+  <script src="templates.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
